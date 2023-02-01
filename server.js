@@ -33,35 +33,34 @@ app.post('/', (req, res) => {
     const tags = req.body.tags;
     const autor_id = req.body.id;
 
-    const logoImg = () => {
-        req.files.file.mv(path.join(__dirname, 'img', req.files.file.name), function (err) {
-            if (err) {
-                res.send('Файл не загружен')
-                res.end()
-            } else {
-                res.send('Файл успешно загружен')
-                let a = path.join(__dirname, 'img', req.files.file.name);
-                let b = path.join(__dirname, 'waterlogo.png')
-                Promise.all([
-                    Jimp.read(a),
-                    Jimp.read(b),
-                ])
-                    .then(function (results) {
-                        results[0].composite(results[1], 50, 30)
-                            .write(path.join(__dirname, 'imgwater', 'water_' + req.files.file.name));
-                        insertSql(autor_id, fileForDB, fileName, tags)
-                    })
-                    .catch(function (err) {
-                        console.error(err);
-                    })
-
-                res.end()
-            }
-        })
-    }
-
-    logoImg()
+    /* const logoImg = async () => { */
+    req.files.file.mv(path.join(__dirname, 'img', req.files.file.name), async function (err) {
+        if (err) {
+            res.send('Файл не загружен')
+            res.end()
+        } else {
+            /*   let a = path.join(__dirname, 'img', req.files.file.name);
+              let b = path.join(__dirname, 'waterlogo.png')
+              Promise.all([
+                  Jimp.read(a),
+                  Jimp.read(b),
+              ])
+                  .then(function (results) {
+                      results[0].composite(results[1], 50, 30)
+                          .write(path.join(__dirname, 'imgwater', 'water_' + req.files.file.name));
+                  })
+                  .catch(function (err) {
+                      console.error(err);
+                  }) */
+            let rows = await insertSql(autor_id, fileName, tags);
+            res.send(JSON.stringify(rows))
+            res.end();
+        }
+    })
+    /*  }
+ logoImg ()*/
 })
+
 
 app.post('/Registration', async (req, res) => {
     const users = await selectDb('users');
@@ -151,32 +150,34 @@ app.get('/userimg/:id', async (req, res) => {
     }
 })
 
+let rowsForDelete = '';
+
+app.get('/deletefile', (req, res) => {
+
+    fs.unlink(path.join(__dirname, 'img', rowsForDelete[0].img_original_big), (err) => {
+        if (err) throw err;
+        console.log('Deleted');
+    });
+    res.end();
+
+})
 
 app.get('/delete/:id', async (req, res) => {
     const id = await req.params.id;
     try {
-        const rows = await selectDbId('data', id)
-        await deleteDbId('data', id)
-        console.log(rows)
-
-        fs.unlink(path.join(__dirname, 'imgwater', rows[0].img_water_big), (err) => {
-            if (err) throw err;
-
-            console.log('Deleted');
-        });
-
-        fs.unlink(path.join(__dirname, 'img', rows[0].img_original_big), (err) => {
-            if (err) throw err;
-
-            console.log('Deleted');
-        });
-
-        return res.json({ id: id })
+        rowsForDelete = await selectDbId('data', id);
+        let author_id = rowsForDelete[0].author_id;
+        const rowsDel = await deleteDbId('data', id, author_id);
+        
+        return res.send(JSON.stringify(rowsDel))
     } catch (error) {
         console.log(error)
         return res.json({ message: 'Ошибка. Попробуйте еще раз' })
     }
 })
+
+
+
 
 app.listen(PORT, (err) => {
     if (err) {
