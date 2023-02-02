@@ -26,7 +26,7 @@ app.get('/', async (req, res) => {
     res.end();
 })
 
-app.post('/', (req, res) => {
+app.post('/add', (req, res) => {
 
     const fileName = req.files.file.name;
     const fileForDB = `water_${fileName}`;
@@ -168,8 +168,12 @@ app.get('/delete/:id', async (req, res) => {
         rowsForDelete = await selectDbId('data', id);
         let author_id = rowsForDelete[0].author_id;
         const rowsDel = await deleteDbId('data', id, author_id);
-        
-        return res.send(JSON.stringify(rowsDel))
+        if (rowsDel.length > 0) {
+            return res.send(JSON.stringify(rowsDel))
+        } else {
+            return res.json([])
+        }
+
     } catch (error) {
         console.log(error)
         return res.json({ message: 'Ошибка. Попробуйте еще раз' })
