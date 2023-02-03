@@ -29,11 +29,11 @@ app.get('/', async (req, res) => {
 app.post('/add', (req, res) => {
 
     const fileName = req.files.file.name;
-    const fileForDB = `water_${fileName}`;
+    /*  const fileForDB = `water_${fileName}`; */
     const tags = req.body.tags;
     const autor_id = req.body.id;
 
-    /* const logoImg = async () => { */
+
     req.files.file.mv(path.join(__dirname, 'img', req.files.file.name), async function (err) {
         if (err) {
             res.send('Файл не загружен')
@@ -57,8 +57,7 @@ app.post('/add', (req, res) => {
             res.end();
         }
     })
-    /*  }
- logoImg ()*/
+
 })
 
 
@@ -180,7 +179,13 @@ app.get('/delete/:id', async (req, res) => {
     }
 })
 
+/* app.get('/itempage/:id', async (req, res) => {
 
+    const id = await req.params.id;
+    const imgForId = await selectDbId('data', id);
+    res.send(JSON.stringify(imgForId))
+    res.end();
+}) */
 
 
 app.listen(PORT, (err) => {
