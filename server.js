@@ -13,6 +13,7 @@ const deleteDbId = require('./models/deleteDbId');
 const bcrypt = require('bcryptjs');
 const generateAccessToken = require('./controller/Auth')
 const authMiddleware = require('./middleware/Middleware')
+const selectImgForAuthorId = require('./models/selectImgForAuthorId');
 
 
 const PORT = 8000;
@@ -179,14 +180,48 @@ app.get('/delete/:id', async (req, res) => {
     }
 })
 
-/* app.get('/itempage/:id', async (req, res) => {
-
+/* выводим одну картинку  */
+app.get('/itempage/:id', async (req, res) => {
     const id = await req.params.id;
     const imgForId = await selectDbId('data', id);
     res.send(JSON.stringify(imgForId))
     res.end();
-}) */
+})
 
+/* выводим автора для страницы с одной картинкой */
+app.get('/author/:id', async (req, res) => {
+    const id = await req.params.id;
+    try {
+        const imgForId = await selectDbId('data', id);
+        const authorId = await imgForId[0].author_id;
+        const author = await selectDbAuthorId('users', authorId);
+        res.send(JSON.stringify(
+            [{ name: author[0].name }]
+        ))
+        res.end();
+    } catch (error) {
+        console.log(error);
+        res.send(JSON.stringify({ message: false }))
+        res.end();
+    }
+})
+
+/* выводим картинки автора для страницы с одной картинкой */
+
+app.get('/authorimg/:id', async (req, res) => {
+    const id = await req.params.id;
+    try {
+        const imgForId = await selectDbId('data', id); /* вытаскиваем картинку по id */
+        const authorId = await imgForId[0].author_id; /* из этой строки вытаскиваем id автора  */
+        const imgAuthorId = await selectImgForAuthorId('data', authorId)
+        res.send(JSON.stringify(imgAuthorId))
+        res.end();
+    } catch (error) {
+        console.log(error);
+        res.send(JSON.stringify({ message: 'Ошибка соединения' }))
+        res.end();
+    }
+})
 
 app.listen(PORT, (err) => {
     if (err) {
