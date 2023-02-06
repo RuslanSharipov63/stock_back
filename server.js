@@ -138,9 +138,11 @@ app.get('/account/:id', async (req, res) => {
 })
 
 app.get('/userimg/:id', async (req, res) => {
-    const id = req.params.id
+    const id = await req.params.id
+    console.log(id)
     try {
         const userImg = await selectDbAuthorId('data', id)
+        console.log(JSON.stringify(userImg))
         res.send(JSON.stringify(userImg))
         res.end();
     } catch (error) {
