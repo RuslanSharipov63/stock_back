@@ -23,9 +23,16 @@ app.use(cors())
 app.use(fileUpload());
 app.use(express.json());
 app.get('/', async (req, res) => {
-    const data = await selectDb('data');
-    res.send(JSON.stringify(data))
-    res.end();
+    try {
+        const data = await selectDb('data');
+        res.send(JSON.stringify(data))
+        res.end();
+    } catch (error) {
+        console.log(error.stack)
+        res.json({ message: false })
+        res.end();
+    }
+
 })
 
 app.post('/add', (req, res) => {
@@ -226,6 +233,23 @@ app.get('/authorimg/:id', async (req, res) => {
         res.send(JSON.stringify({ message: 'Ошибка соединения' }))
         res.end();
     }
+})
+
+/* выводим данные на основании поиска */
+app.get('/searchpage/:search', async (req, res) => {
+    const search = await req.params.search;
+    try {
+        const datasearch = await selectDb('data');
+        const datafilter = await datasearch.filter(item => item.tags.toLowerCase().includes(search.toLowerCase()));
+        res.send(JSON.stringify(datafilter));
+        res.end()
+
+    } catch (error) {
+        console.log(error)
+        res.send(JSON.stringify({ message: 'Ошибка выборки из базы данных' }))
+        res.end();
+    }
+
 })
 
 app.listen(PORT, (err) => {
