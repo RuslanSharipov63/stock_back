@@ -252,6 +252,23 @@ app.get('/searchpage/:search', async (req, res) => {
 
 })
 
+/* роут для скачивания файла */
+app.get('/downdload', (req, res) => {
+    try {
+        const file = req.params.file;
+        const fileLocation = path.join('./img', file);
+        console.log(fileLocation);
+        /* здесь надо переименовать файл */
+        res.download(fileLocation, file);
+        res.json({ message: true })
+        res.end();
+    } catch (error) {
+        console.log(error.stack)
+        res.json({ message: false })
+        res.end();
+    }
+})
+
 app.listen(PORT, (err) => {
     if (err) {
         console.log(err)
