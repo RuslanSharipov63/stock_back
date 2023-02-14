@@ -253,13 +253,17 @@ app.get('/searchpage/:search', async (req, res) => {
 })
 
 /* роут для скачивания файла */
-app.get('/downdload', (req, res) => {
+app.post('/download', (req, res) => {
     try {
-        const file = req.params.file;
-        const fileLocation = path.join('./img', file);
-        console.log(fileLocation);
-        /* здесь надо переименовать файл */
-        res.download(fileLocation, file);
+        const file = req.body.name;
+        const fileLocation = path.join('./img/', file); /* путь к файлу */
+        const expansionArr = fileLocation.split('.') /* массив из пути делаем с разделением по точке */
+        const expansion = expansionArr[expansionArr.length - 1];/* вытаскиваем последнее значение это наше расширение*/
+        /* копируем файл */
+        fs.copyFile(fileLocation, path.join('./download/', 'stok' + '.' + expansion), err => {
+            if (err) throw err;
+        });
+        res.download(path.join('./download/', 'stok' + '.' + expansion));
         res.json({ message: true })
         res.end();
     } catch (error) {
