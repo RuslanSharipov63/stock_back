@@ -269,7 +269,8 @@ app.get('/download/:filename', (req, res) => {
     /*     res.setHeader('Content-disposition', 'attachment; filename=stok.' + expansion); */
     /* let kj = path.join(__dirname + '/download/', 'stok.' + expansion) */
     console.log(fileLocation)
-    res.download(fileLocation)
+    res.send(JSON.stringify({path: fileLocation}))
+    res.end();
 
     /* , (err) => { */
     /*  if (err) {
