@@ -253,24 +253,44 @@ app.get('/searchpage/:search', async (req, res) => {
 })
 
 /* роут для скачивания файла */
-app.post('/download', (req, res) => {
-    try {
-        const file = req.body.name;
-        const fileLocation = path.join('./img/', file); /* путь к файлу */
-        const expansionArr = fileLocation.split('.') /* массив из пути делаем с разделением по точке */
-        const expansion = expansionArr[expansionArr.length - 1];/* вытаскиваем последнее значение это наше расширение*/
-        /* копируем файл */
-        fs.copyFile(fileLocation, path.join('./download/', 'stok' + '.' + expansion), err => {
-            if (err) throw err;
-        });
-        res.download(path.join('./download/', 'stok' + '.' + expansion));
-        res.json({ message: true })
-        res.end();
-    } catch (error) {
-        console.log(error.stack)
-        res.json({ message: false })
-        res.end();
-    }
+app.get('/download/:filename', (req, res) => {
+    /*  try { */
+    const fileName = req.params.filename;
+    console.log(fileName)
+    const fileLocation = path.join(__dirname + '/img/', fileName); /* путь к файлу */
+    const expansionArr = fileLocation.split('.') /* массив из пути делаем с разделением по точке */
+    const expansion = expansionArr[expansionArr.length - 1];/* вытаскиваем последнее значение это наше расширение*/
+    /* копируем файл */
+    /*  fs.copyFile(fileLocation, path.join('./download/', 'stok' + '.' + expansion), err => {
+         if (err) {
+             console.log(err)
+         };
+     }); */
+    /*     res.setHeader('Content-disposition', 'attachment; filename=stok.' + expansion); */
+    /* let kj = path.join(__dirname + '/download/', 'stok.' + expansion) */
+    console.log(fileLocation)
+    res.download(fileLocation)
+
+    /* , (err) => { */
+    /*  if (err) {
+         res.status(404)
+         console.log('download failed');
+         console.error(err);
+         res.end();
+
+     } else {
+         console.log('downloaded seccefully');
+         res.send(JSON.stringify({ message: true }))
+         res.end();
+
+     }
+ } *//* ); */
+    /*  } catch (error) {
+         console.log(error.stack)
+         res.send(JSON.stringify({ message: false }))
+ 
+ 
+     }*/
 })
 
 app.listen(PORT, (err) => {
