@@ -41,8 +41,8 @@ app.post('/add', (req, res) => {
     /*  const fileForDB = `water_${fileName}`; */
     const tags = req.body.tags;
     const autor_id = req.body.id;
-
-
+    const size = req.body.size;
+    console.log(size)
     req.files.file.mv(path.join(__dirname, 'img', req.files.file.name), async function (err) {
         if (err) {
             res.send('Файл не загружен')
@@ -61,7 +61,7 @@ app.post('/add', (req, res) => {
                   .catch(function (err) {
                       console.error(err);
                   }) */
-            let rows = await insertSql(autor_id, fileName, tags);
+            let rows = await insertSql(autor_id, fileName, tags, size);
             res.send(JSON.stringify(rows))
             res.end();
         }
@@ -254,45 +254,17 @@ app.get('/searchpage/:search', async (req, res) => {
 
 /* роут для скачивания файла */
 app.get('/download/:filename', (req, res) => {
-    /*  try { */
-    const fileName = req.params.filename;
-    console.log(fileName)
-    const fileLocation = path.join(__dirname + '/img/', fileName); /* путь к файлу */
-    const expansionArr = fileLocation.split('.') /* массив из пути делаем с разделением по точке */
-    const expansion = expansionArr[expansionArr.length - 1];/* вытаскиваем последнее значение это наше расширение*/
-    /* копируем файл */
-    /*  fs.copyFile(fileLocation, path.join('./download/', 'stok' + '.' + expansion), err => {
-         if (err) {
-             console.log(err)
-         };
-     }); */
-    /*     res.setHeader('Content-disposition', 'attachment; filename=stok.' + expansion); */
-    /* let kj = path.join(__dirname + '/download/', 'stok.' + expansion) */
-    console.log(fileLocation)
-   /*  res.send(JSON.stringify({path: fileLocation})) */
-   res.download(fileLocation)
-   /*  res.end(); */
+    try {
+        const fileName = req.params.filename;
+        const fileLocation = path.join(__dirname + '/img/', fileName); /* путь к файлу */
+        res.download(fileLocation, (error) => {
+            if (error) console.log(error)
+        })
+    } catch (error) {
+        console.log(error.stack)
+        res.send(JSON.stringify({ message: false }))
 
-    /* , (err) => { */
-    /*  if (err) {
-         res.status(404)
-         console.log('download failed');
-         console.error(err);
-         res.end();
-
-     } else {
-         console.log('downloaded seccefully');
-         res.send(JSON.stringify({ message: true }))
-         res.end();
-
-     }
- } *//* ); */
-    /*  } catch (error) {
-         console.log(error.stack)
-         res.send(JSON.stringify({ message: false }))
- 
- 
-     }*/
+    }
 })
 
 app.listen(PORT, (err) => {
