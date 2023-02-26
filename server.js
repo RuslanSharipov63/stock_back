@@ -15,7 +15,7 @@ const generateAccessToken = require('./controller/Auth')
 const authMiddleware = require('./middleware/Middleware')
 const selectImgForAuthorId = require('./models/selectImgForAuthorId');
 const selectImgForAccount = require('./models/selectImgForAccount')
-
+const regExtension = require('./middleware/RegExtension');
 
 const PORT = 8000;
 const app = express();
@@ -29,7 +29,7 @@ app.get('/', async (req, res) => {
         res.end();
     } catch (error) {
         console.log(error.stack)
-        res.json({ message: false })
+        /* res.json({ message: false }) */
         res.end();
     }
 
@@ -266,6 +266,40 @@ app.get('/download/:filename', (req, res) => {
 
     }
 })
+
+/* роут для вывода только картинок */
+app.get('/images', async (req, res) => {
+    try {
+        let data = await selectDb('data');
+        const dataFilter = await data.filter(item => regExtension.test(item.img_original_big));
+        res.send(JSON.stringify(dataFilter))
+        res.end();
+
+    } catch (error) {
+        console.log(error.stack)
+        res.send(JSON.stringify({ message: 'true' }))
+        res.end();
+    }
+})
+
+
+/* роут для вывода только видео */
+
+app.get('/videos', async (req, res) => {
+    try {
+        let data = await selectDb('data');
+        const dataFilter = await data.filter(item => !regExtension.test(item.img_original_big));
+        res.send(JSON.stringify(dataFilter))
+        res.end();
+
+    } catch (error) {
+        console.log(error.stack)
+        res.send(JSON.stringify({ message: 'true' }))
+        res.end();
+    }
+})
+
+
 
 app.listen(PORT, (err) => {
     if (err) {
