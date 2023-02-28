@@ -16,20 +16,24 @@ const authMiddleware = require('./middleware/Middleware')
 const selectImgForAuthorId = require('./models/selectImgForAuthorId');
 const selectImgForAccount = require('./models/selectImgForAccount')
 const regExtension = require('./middleware/RegExtension');
+const countRows = require('./models/countRows');
 
 const PORT = 8000;
 const app = express();
 app.use(cors())
 app.use(fileUpload());
 app.use(express.json());
+
 app.get('/', async (req, res) => {
+    let a = await countRows();
+    let countOffset = 0;
     try {
-        const data = await selectDb('data');
+        const data = await selectDb('data', countOffset);
+        await bigData.data.push(data)
         res.send(JSON.stringify(data))
         res.end();
     } catch (error) {
         console.log(error.stack)
-        /* res.json({ message: false }) */
         res.end();
     }
 
@@ -106,11 +110,6 @@ app.post('/Auth', async (req, res) => {
         const token = generateAccessToken(isEmail.id, isEmail.email);
         userId = isEmail.id;
         return res.json({ token })
-        /*   if (validPassword) {
-              return res.json({
-                  message: true, code: 3
-              })
-          } */
     } catch (error) {
         res.json({ message: 'Отмена авторизации. Попробуйте еще раз' })
         console.log(error.stack)
