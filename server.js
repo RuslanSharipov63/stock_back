@@ -16,7 +16,9 @@ const authMiddleware = require('./middleware/Middleware')
 const selectImgForAuthorId = require('./models/selectImgForAuthorId');
 const selectImgForAccount = require('./models/selectImgForAccount')
 const regExtension = require('./middleware/RegExtension');
-const countRows = require('./models/countRows');
+const rowsImgDb = require('./middleware/rowsImgDb');
+const allRowsDB = require('./middleware/allRowsDB')
+const rowsVideoDb = require('./middleware/rowsVideoDb');
 
 const PORT = 8000;
 const app = express();
@@ -25,11 +27,10 @@ app.use(fileUpload());
 app.use(express.json());
 
 app.get('/', async (req, res) => {
-    let a = await countRows();
+
     let countOffset = 0;
     try {
         const data = await selectDb('data', countOffset);
-        await bigData.data.push(data)
         res.send(JSON.stringify(data))
         res.end();
     } catch (error) {
@@ -298,7 +299,34 @@ app.get('/videos', async (req, res) => {
     }
 })
 
+/* запрос на общее число строк в таблице */
 
+app.get('/rows/:param', async (req, res) => {
+    let countRows = await 0
+    try {
+        switch (req.params.param) {
+            case 'all':
+                countRows = await allRowsDB();
+                break;
+            case 'image':
+                countRows = await rowsImgDb()
+                break;
+            case 'video':
+                countRows = await rowsVideoDb()
+                break;
+            default:
+                countRows = await 0
+        }
+        res.send(JSON.stringify(countRows[0]['COUNT(*)']))
+        res.end();
+    } catch (error) {
+        console.log(error.stack)
+        res.send(JSON.stringify({ message: false }))
+        res.end();
+    }
+
+
+})
 
 app.listen(PORT, (err) => {
     if (err) {
