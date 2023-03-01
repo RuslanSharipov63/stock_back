@@ -299,7 +299,7 @@ app.get('/videos', async (req, res) => {
     }
 })
 
-/* запрос на общее число строк в таблице */
+/* запрос на число строк в таблице */
 
 app.get('/rows/:param', async (req, res) => {
     let countRows = await 0
@@ -326,6 +326,20 @@ app.get('/rows/:param', async (req, res) => {
     }
 
 
+})
+
+app.get('/page/:count', async (req, res) => {
+    let countParam = await req.params.count;
+    let countOffset = await countParam === 1 ? 0 : countParam * 5 - 5;
+    try {
+        console.log(countOffset)
+        const data = await selectDb('data', countOffset);
+        res.send(JSON.stringify(data))
+        res.end();
+    } catch (error) {
+        console.log(error.stack)
+        res.end();
+    }
 })
 
 app.listen(PORT, (err) => {
