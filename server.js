@@ -329,7 +329,7 @@ app.get('/rows/:param', async (req, res) => {
 })
 
 app.get('/page/:count', async (req, res) => {
-    let countParam = await req.params.count;
+    let countParam = await +req.params.count;
     let countOffset = await countParam === 1 ? 0 : countParam * 5 - 5;
     try {
         const data = await selectDb('data', countOffset);
