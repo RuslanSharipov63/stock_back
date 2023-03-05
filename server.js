@@ -26,9 +26,10 @@ app.use(cors())
 app.use(fileUpload());
 app.use(express.json());
 
+let countOffset = 0;
+
 app.get('/', async (req, res) => {
 
-    let countOffset = 0;
     try {
         const data = await selectDb('data', countOffset);
         res.send(JSON.stringify(data))
@@ -270,7 +271,7 @@ app.get('/download/:filename', (req, res) => {
 /* роут для вывода только картинок */
 app.get('/images', async (req, res) => {
     try {
-        let data = await selectDb('data');
+        let data = await selectDb('data', countOffset);
         const dataFilter = await data.filter(item => regExtension.test(item.img_original_big));
         res.send(JSON.stringify(dataFilter))
         res.end();
@@ -287,7 +288,7 @@ app.get('/images', async (req, res) => {
 
 app.get('/videos', async (req, res) => {
     try {
-        let data = await selectDb('data');
+        let data = await selectDb('data', countOffset);
         const dataFilter = await data.filter(item => !regExtension.test(item.img_original_big));
         res.send(JSON.stringify(dataFilter))
         res.end();
