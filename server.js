@@ -317,7 +317,9 @@ app.get('/rows/:param', async (req, res) => {
                 break;
             default:
                 countRows = await 0
+                break;
         }
+        
         res.send(JSON.stringify(countRows[0]['COUNT(*)']))
         res.end();
     } catch (error) {

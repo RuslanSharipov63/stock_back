@@ -8,6 +8,7 @@ module.exports = async function rowsImgDb() {
     const [rows] = await conn.execute('SELECT * FROM data');
     const dataVideo = await rows.filter(item => !regExtension.test(item.img_original_big));
     const dataVideoRows = await dataVideo.length;
+    const arrRows = Array.isArray(dataVideoRows) ? dataVideoRows : [{ 'COUNT(*)': dataVideoRows }]
     conn.end();
-    return dataVideoRows;
+    return arrRows;
 }
