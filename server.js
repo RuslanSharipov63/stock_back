@@ -28,8 +28,8 @@ app.use(express.json());
 
 let countOffset = 0;
 
-app.get('/', async (req, res) => {
 
+app.get('/', async (req, res) => {
     try {
         const data = await selectDb('data', countOffset);
         res.send(JSON.stringify(data))
