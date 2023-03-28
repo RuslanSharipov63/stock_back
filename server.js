@@ -30,14 +30,15 @@ let countOffset = 0;
 
 
 app.get('/', async (req, res) => {
-    try {
+
+  try {
         const data = await selectDb('data', countOffset);
         res.send(JSON.stringify(data))
         res.end();
     } catch (error) {
         console.log(error.stack)
         res.end();
-    }
+    } 
 
 })
 
